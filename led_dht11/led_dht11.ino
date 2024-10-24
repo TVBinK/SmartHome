@@ -66,20 +66,12 @@ void setup() {
 }
 
 unsigned long lastUpdateTime = 0; // Biến để lưu thời gian cập nhật lần cuối
-const unsigned long updateInterval = 10000; // 5 giây (5000 ms)
+const unsigned long updateInterval = 60000; // 1 p (5000 ms)
 
 void loop() {
   // Đọc trạng thái từ TTP223
   int sensorState = digitalRead(sensorPin);
-
-  // Lấy thời gian hiện tại
-  unsigned long currentTime = millis();
-  
-  // Kiểm tra nếu đã đến thời điểm cập nhật dữ liệu (sau mỗi 5 giây)
-  if (currentTime - lastUpdateTime >= updateInterval) {
-    lastUpdateTime = currentTime; // Cập nhật thời gian lần cuối
-
-    // In ra trạng thái cảm biến và cập nhật lên Firebase
+  // In ra trạng thái cảm biến
     lcd.setCursor(0, 0); 
     float tc = dht.readTemperature(false);  // Đọc nhiệt độ bằng DHT (đơn vị Celsius)
     float hu = dht.readHumidity();          // Đọc độ ẩm bằng DHT
@@ -92,7 +84,12 @@ void loop() {
     lcd.print("Hum: ");
     lcd.print(hu);
     lcd.println(" %                ");
-    
+  // Lấy thời gian hiện tại
+  unsigned long currentTime = millis();
+  
+  // Kiểm tra nếu đã đến thời điểm cập nhật dữ liệu (sau mỗi 5 giây)
+  if (currentTime - lastUpdateTime >= updateInterval) {
+    lastUpdateTime = currentTime; // Cập nhật thời gian lần cuối
     // Gửi dữ liệu lên Firebase
     FirebaseJson json;
     json.set("/environment/temperature", tc);
